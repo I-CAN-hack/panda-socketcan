@@ -3,11 +3,38 @@
 CANnectivity firmware for comma.ai panda adapters, exposing three CAN channels
 through Linux's existing `gs_usb` driver.
 
-| Variant | MCU | CAN support | Flash command |
+| Variant | MCU | CAN support | Firmware file |
 | --- | --- | --- | --- |
-| White | STM32F413 | Classic CAN | `./flash.sh --white` (default) |
-| Black | STM32F413 | Classic CAN, harness detection | `./flash.sh --black` |
-| Red | STM32H725 | Classic CAN and CAN FD, harness detection | `./flash.sh --red` |
+| White | STM32F413 | Classic CAN | `panda-white.bin` |
+| Black | STM32F413 | Classic CAN, harness detection | `panda-black.bin` |
+| Red | STM32H725 | Classic CAN and CAN FD, harness detection | `panda-red.bin` |
+
+## Download and flash
+
+Download the `.bin` for your panda variant from
+[GitHub Releases](https://github.com/I-CAN-hack/panda-socketcan/releases).
+These files are ready to flash; building from source is optional.
+
+Enter **STM32 ROM DFU mode** by holding **BOOT0 high during reset or power-on**,
+using the board's recovery pads or a panda paw. The device should enumerate as
+`0483:df11` (`STM32 BOOTLOADER`).
+
+Flash with `dfu-util`, using the matching filename (red panda shown):
+
+```sh
+dfu-util --device 0483:df11 --alt 0 \
+  --dfuse-address 0x08000000:leave --download panda-red.bin
+```
+
+You can also use a web-based flasher such as the
+[Akrodyn STM32 DFU flasher](https://akrodyn.com/en/tools/stm32) in a
+WebUSB-capable browser such as Chrome or Edge. Select the matching `.bin`, click
+**Connect & flash**, and choose the STM32 bootloader in the device dialog.
+The firmware starts at **0x08000000** if a flasher asks for an address.
+
+Return BOOT0 to its normal state after flashing. You may need to reset or
+reconnect the device to boot the firmware. Flashing replaces the factory panda
+bootstub and firmware; subsequent updates also use hardware ROM DFU.
 
 ## Build and flash
 
@@ -27,11 +54,6 @@ flashes internal flash at **0x08000000** with `dfu-util`. It replaces the factor
 bootstub and firmware. There is no application bootloader or firmware update
 protocol; subsequent flashing also uses hardware ROM DFU.
 
-Enter ROM DFU by holding **BOOT0 high during reset or power-on**, using the
-board's recovery pads or a panda paw. It should enumerate as `0483:df11`
-(`STM32 BOOTLOADER`). Return BOOT0 to its normal state for regular boot. You may
-need to reset or reconnect the device after flashing.
-
 Build and flashing run as your normal user, using your existing DFU udev rules.
 
 For multiple connected DFU devices, select one explicitly:
@@ -49,6 +71,10 @@ Build without accessing hardware:
 ```
 
 The output is `build/<variant>/zephyr/zephyr.bin` (and `zephyr.elf` for debugging).
+GitHub Actions also provides a downloadable `panda-firmware` artifact containing
+`panda-white.bin`, `panda-black.bin`, and `panda-red.bin`. Find it under
+**Artifacts** on a successful workflow run.
+
 The first run needs network access for Nix packages and source checkouts; later
 builds reuse the pinned dependencies. Generated files stay in `.west/`, `deps/`
 and `build/` and are ignored by Git. Do not edit the upstream checkouts: `west
@@ -76,6 +102,8 @@ the three logical USB CAN channels.
 `app/` supplies a small entry point and black/red harness support while reusing
 upstream CANnectivity's USB protocol, USB descriptors, LEDs and timestamps.
 The dependency checkouts remain unmodified. GitHub Actions builds all three variants.
+Pushing a Git tag also publishes a GitHub Release with all three binaries after
+the build succeeds.
 
 All three targets compile with the pinned dependencies. Hardware operation has
 not yet been tested.

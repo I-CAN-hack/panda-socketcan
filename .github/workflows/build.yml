@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -18,7 +18,24 @@ jobs:
       - name: Build all panda variants
         run: |
           nix develop --command bash -e -c '
+            mkdir -p build/firmware
             for variant in white black red; do
               ./flash.sh "--$variant" --build-only
+              cp "build/$variant/zephyr/zephyr.bin" "build/firmware/panda-$variant.bin"
             done
           '
+      - name: Upload firmware binaries
+        uses: actions/upload-artifact@v7
+        with:
+          name: panda-firmware
+          path: build/firmware/
+          if-no-files-found: error
+      - name: Publish tagged release
+        if: github.event_name == 'push' && github.ref_type == 'tag' && !github.event.deleted
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create --verify-tag --generate-notes --title "$RELEASE_TAG" \
+            -- "$RELEASE_TAG" build/firmware/*.bin
