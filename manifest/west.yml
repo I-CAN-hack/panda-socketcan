@@ -1,0 +1,19 @@
+manifest:
+  version: "1.2"
+  projects:
+    - name: cannectivity
+      url: https://github.com/CANnectivity/cannectivity
+      revision: f229e129aa0859b79f2997d1cdc0443e10d97eee # v1.4.0
+      path: deps/cannectivity
+    - name: zephyr
+      url: https://github.com/zephyrproject-rtos/zephyr
+      revision: 684c9e8f32e4373a21098559f748f06915f950c9 # v4.4.0
+      # The import's path-prefix applies to this project as well as its modules.
+      path: zephyr
+      import:
+        path-prefix: deps
+        name-allowlist:
+          - cmsis_6
+          - hal_stm32
+  self:
+    path: manifest

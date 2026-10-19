@@ -1,0 +1,6 @@
+board:
+  name: panda_white
+  full_name: White Panda
+  vendor: comma
+  socs:
+    - name: stm32f413xx
