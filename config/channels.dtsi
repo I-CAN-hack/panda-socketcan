@@ -1,0 +1,31 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/ {
+	gs_usb0: gs_usb0 {
+		compatible = "gs_usb";
+		label = "gs_usb";
+	};
+
+	cannectivity: cannectivity {
+		compatible = "cannectivity";
+		timestamp-counter = <&counter2>;
+
+		/* Channel order follows panda's default bus 0, 1, 2 mapping. */
+		channel0 {
+			compatible = "cannectivity-channel";
+			can-controller = <&can1>;
+			state-led = <&green_led>;
+		};
+		channel1 {
+			compatible = "cannectivity-channel";
+			can-controller = <&can2>;
+			state-led = <&blue_led>;
+		};
+		channel2 {
+			compatible = "cannectivity-channel";
+			can-controller = <&can3>;
+			state-led = <&red_led>;
+		};
+	};
+};
+

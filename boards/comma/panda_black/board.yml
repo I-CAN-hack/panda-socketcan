@@ -1,0 +1,6 @@
+board:
+  name: panda_black
+  full_name: Black Panda
+  vendor: comma
+  socs:
+    - name: stm32f413xx

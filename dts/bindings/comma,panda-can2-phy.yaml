@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+description: Panda CAN2 transceiver pair selected by harness orientation
+compatible: "comma,panda-can2-phy"
+include: can-transceiver.yaml
+properties:
+  normal-standby-gpios:
+    type: phandle-array
+    required: true
+  flipped-standby-gpios:
+    type: phandle-array
+    required: true

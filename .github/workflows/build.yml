@@ -15,5 +15,10 @@ jobs:
       - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build white panda firmware
-        run: nix develop --command ./flash.sh --build-only
+      - name: Build all panda variants
+        run: |
+          nix develop --command bash -e -c '
+            for variant in white black red; do
+              ./flash.sh "--$variant" --build-only
+            done
+          '

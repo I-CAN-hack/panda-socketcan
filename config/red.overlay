@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+#include "channels.dtsi"
+
+&timers2 {
+	status = "okay";
+	/* APB1 timer clock = 120 MHz; prescaler register = 120 - 1. */
+	st,prescaler = <119>;
+	counter2: counter {
+		compatible = "st,stm32-counter";
+		status = "okay";
+	};
+};

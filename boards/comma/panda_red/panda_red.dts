@@ -1,0 +1,163 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Hardware reference: commaai/panda f849893b, board/boards/red.h and
+ * board/stm32h7/{clock,peripherals,llfdcan_declarations}.h.
+ */
+/dts-v1/;
+#include <st/h7/stm32h725Xg.dtsi>
+#include <st/h7/stm32h725zgtx-pinctrl.dtsi>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "comma.ai red panda (STM32H725)";
+	compatible = "comma,panda-red";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,canbus = &fdcan1;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		red_led: red {
+			gpios = <&gpioe 4 GPIO_ACTIVE_LOW>;
+		};
+		green_led: green {
+			gpios = <&gpioe 3 GPIO_ACTIVE_LOW>;
+		};
+		blue_led: blue {
+			gpios = <&gpioe 2 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	can1_phy: can1-phy {
+		compatible = "can-transceiver-gpio";
+		#phy-cells = <0>;
+		max-bitrate = <5000000>;
+		standby-gpios = <&gpiog 11 GPIO_ACTIVE_HIGH>;
+	};
+	can2_phy: can2-phy {
+		compatible = "comma,panda-can2-phy";
+		#phy-cells = <0>;
+		max-bitrate = <5000000>;
+		normal-standby-gpios = <&gpiob 3 GPIO_ACTIVE_HIGH>;
+		flipped-standby-gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>;
+	};
+	can3_phy: can3-phy {
+		compatible = "can-transceiver-gpio";
+		#phy-cells = <0>;
+		max-bitrate = <5000000>;
+		standby-gpios = <&gpiod 7 GPIO_ACTIVE_HIGH>;
+	};
+
+	panda_harness: harness {
+		compatible = "comma,panda-harness";
+		sbu-gpios = <&gpioc 4 GPIO_ACTIVE_HIGH>, <&gpioa 1 GPIO_ACTIVE_HIGH>;
+		io-channels = <&adc1 4>, <&adc1 17>;
+		relay-gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>, <&gpioc 11 GPIO_ACTIVE_HIGH>;
+		can-controller = <&fdcan2>;
+		pinctrl-0 = <&fdcan2_rx_pb12 &fdcan2_tx_pb13>;
+		pinctrl-names = "default";
+	};
+};
+
+&pwr {
+	/* Red panda uses the H725's internal SMPS directly. */
+	power-supply = "smps-direct";
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(25)>;
+	status = "okay";
+};
+
+&clk_hsi48 {
+	status = "okay";
+};
+
+&pll {
+	clocks = <&clk_hse>;
+	div-m = <5>;
+	mul-n = <48>;
+	div-p = <1>;
+	div-q = <3>;
+	div-r = <2>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(240)>;
+	d1cpre = <1>;
+	hpre = <2>;
+	d1ppre = <2>;
+	d2ppre1 = <2>;
+	d2ppre2 = <2>;
+	d3ppre = <2>;
+};
+
+/* The three controllers share 10 KiB of message RAM. Reserve 3384 bytes each,
+ * as in panda: 1 standard + 1 extended filter, 24 RX slots, 16 TX events/slots.
+ * Each configured region uses 3020 bytes, including 64-byte FD payloads.
+ */
+can1: &fdcan1 {
+	pinctrl-0 = <&fdcan1_rx_pb8 &fdcan1_tx_pb9>;
+	pinctrl-names = "default";
+	phys = <&can1_phy>;
+	clocks = <&rcc STM32_CLOCK(APB1_2, 8)>, <&rcc STM32_SRC_PLL1_Q FDCAN_SEL(1)>;
+	reg = <0x4000a000 0x400>, <0x4000ac00 0x2800>;
+	bosch,mram-cfg = <0x0000 1 1 24 0 0 16 16>;
+	status = "okay";
+};
+
+can2: &fdcan2 {
+	pinctrl-0 = <&fdcan2_rx_pb5 &fdcan2_tx_pb6>;
+	pinctrl-names = "default";
+	phys = <&can2_phy>;
+	clocks = <&rcc STM32_CLOCK(APB1_2, 8)>, <&rcc STM32_SRC_PLL1_Q FDCAN_SEL(1)>;
+	reg = <0x4000a400 0x400>, <0x4000ac00 0x2800>;
+	bosch,mram-cfg = <0x0d38 1 1 24 0 0 16 16>;
+	status = "okay";
+};
+
+can3: &fdcan3 {
+	/* AF2 assigns PG10 to RX and PG9 to TX. */
+	pinctrl-0 = <&fdcan3_rx_pg10 &fdcan3_tx_pg9>;
+	pinctrl-names = "default";
+	phys = <&can3_phy>;
+	clocks = <&rcc STM32_CLOCK(APB1_2, 8)>, <&rcc STM32_SRC_PLL1_Q FDCAN_SEL(1)>;
+	reg = <0x4000d400 0x400>, <0x4000ac00 0x2800>;
+	bosch,mram-cfg = <0x1a70 1 1 24 0 0 16 16>;
+	status = "okay";
+};
+
+&adc1 {
+	st,adc-clock-source = "SYNC";
+	st,adc-prescaler = <4>;
+	status = "okay";
+};
+
+zephyr_udc0: &usbotg_hs {
+	pinctrl-0 = <&usb_otg_hs_dm_pa11 &usb_otg_hs_dp_pa12>;
+	pinctrl-names = "default";
+	maximum-speed = "full-speed";
+	status = "okay";
+};
+
+&usb_otg_hs_dm_pa11 {
+	slew-rate = "very-high-speed";
+};
+
+&usb_otg_hs_dp_pa12 {
+	slew-rate = "very-high-speed";
+};
+
+&gpiob {
+	usb_load_switch {
+		gpio-hog;
+		gpios = <14 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN | GPIO_PULL_UP)>;
+		output-high;
+		line-name = "USB load switch released";
+	};
+};

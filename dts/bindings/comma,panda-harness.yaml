@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+description: Panda reversible harness orientation detection and alternate CAN2 pins
+compatible: "comma,panda-harness"
+include: [base.yaml, pinctrl-device.yaml]
+properties:
+  sbu-gpios:
+    type: phandle-array
+    required: true
+    description: SBU1 and SBU2 voltage sense pins, in that order
+  io-channels:
+    type: phandle-array
+    required: true
+    description: ADC inputs for SBU1 and SBU2, in that order
+  relay-gpios:
+    type: phandle-array
+    required: true
+    description: Open-drain SBU1 and SBU2 relay controls; high releases both relays
+  can-controller:
+    type: phandle
+    required: true
+    description: CAN2 controller whose default pins change with harness orientation

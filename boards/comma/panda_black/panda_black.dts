@@ -1,0 +1,52 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Hardware reference: commaai/panda f849893b, board/boards/black.h.
+ */
+/dts-v1/;
+#include "../common/panda_f4.dtsi"
+
+/ {
+	model = "comma.ai black panda (STM32F413)";
+	compatible = "comma,panda-black";
+
+	panda_harness: harness {
+		compatible = "comma,panda-harness";
+		sbu-gpios = <&gpioc 0 GPIO_ACTIVE_HIGH>, <&gpioc 3 GPIO_ACTIVE_HIGH>;
+		io-channels = <&adc1 10>, <&adc1 13>;
+		relay-gpios = <&gpioc 10 GPIO_ACTIVE_HIGH>, <&gpioc 11 GPIO_ACTIVE_HIGH>;
+		can-controller = <&can2>;
+		/* Alternative default state for CAN2 with a flipped harness. */
+		pinctrl-0 = <&can2_rx_pb12 &can2_tx_pb13>;
+		pinctrl-names = "default";
+	};
+};
+
+&can2_phy {
+	compatible = "comma,panda-can2-phy";
+	/delete-property/ standby-gpios;
+	normal-standby-gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>;
+	flipped-standby-gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;
+};
+
+&adc1 {
+	st,adc-prescaler = <4>;
+	status = "okay";
+};
+
+&gpiob {
+	usb_load_switch {
+		gpio-hog;
+		gpios = <1 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "USB load switch enabled";
+	};
+};
+
+&gpioc {
+	gps_off {
+		gpio-hog;
+		gpios = <5 GPIO_ACTIVE_HIGH>, <12 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "GPS off";
+	};
+};

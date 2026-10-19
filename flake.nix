@@ -1,5 +1,5 @@
 {
-  description = "White panda CANnectivity firmware development";
+  description = "Panda CANnectivity firmware development";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 

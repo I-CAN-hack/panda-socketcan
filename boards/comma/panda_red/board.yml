@@ -1,0 +1,6 @@
+board:
+  name: panda_red
+  full_name: Red Panda
+  vendor: comma
+  socs:
+    - name: stm32h725xx
