@@ -1,4 +1,8 @@
+# Copyright (c) 2024 Henrik Brix Andersen <henrik@brixandersen.dk>
+# Copyright (c) 2026 Willem Melching
 # SPDX-License-Identifier: Apache-2.0
+# Adapted from CANnectivity app/CMakeLists.txt for the panda application.
+
 cmake_minimum_required(VERSION 3.13.1)
 list(APPEND DTS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../deps/cannectivity/app)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})

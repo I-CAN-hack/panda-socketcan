@@ -1,4 +1,11 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/*
+ * Copyright (c) 2024 Henrik Brix Andersen <henrik@brixandersen.dk>
+ * Copyright (c) 2026 Willem Melching
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Adapted from CANnectivity app/src/main.c for panda harness support.
+ */
 
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>

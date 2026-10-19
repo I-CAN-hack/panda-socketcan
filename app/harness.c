@@ -3,6 +3,7 @@
  *
  * SBU detection and routing follow commaai/panda f849893b,
  * board/drivers/harness.h and board/boards/{black,red}.h.
+ * The original panda copyright and MIT permission notice are in NOTICE.
  */
 
 #include <zephyr/device.h>
