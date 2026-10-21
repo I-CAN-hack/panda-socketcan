@@ -101,7 +101,11 @@ the three logical USB CAN channels.
 
 `app/` supplies a small entry point and black/red harness support while reusing
 upstream CANnectivity's USB protocol, USB descriptors, LEDs and timestamps.
-The dependency checkouts remain unmodified. GitHub Actions builds all three variants.
+The dependency checkouts remain unmodified. Red builds generate a local copy of
+Zephyr's M_CAN driver with FIFO transmission and hardware put-index allocation;
+the build stops if the expected upstream code changes. The local override lives
+in `cmake/mcan_tx_fifo.cmake` and `scripts/mcan_tx_fifo.py`.
+GitHub Actions builds all three variants.
 Pushing a Git tag also publishes a GitHub Release with all three binaries after
 the build succeeds.
 
@@ -164,6 +168,12 @@ The ESP is held off, GMLAN stays asleep, and unused K/L-line TX pins stay at UAR
 idle. K-line, L-line, GMLAN, Wi-Fi and openpilot's safety/forwarding features are
 outside this adapter's scope. CAN termination must be provided on the bench bus.
 
+White and black configure bxCAN transmit mailboxes in request order (`TXFP`).
+This preserves frame order under load, including repeated frames with the same
+CAN ID, as required by protocols such as ISO-TP. The upstream Zephyr default
+prioritizes identifiers and then mailbox numbers, which can reorder frames with
+the same ID when a lower-numbered mailbox is reused.
+
 PA13 and PA14 serve board controls, as in the factory firmware, and overlap the
 SWD pins. Hardware ROM DFU is the intended flashing/recovery route.
 
@@ -188,8 +198,12 @@ Black shares white's 16 MHz crystal, 96 MHz CPU clock and 1 MHz TIM2 timestamps.
 Its GPS is held off and the USB load switch is enabled. Red uses a 25 MHz crystal,
 240 MHz CPU, 80 MHz FDCAN kernel clock, and HSI48 for full-speed USB. TIM2 also
 runs at 1 MHz. Each FDCAN controller gets a separate region of the shared 10 KiB
-message RAM, with 64-byte payloads and data bitrates up to 5 Mbit/s. Red targets
-the STM32H725 with direct SMPS supply.
+message RAM, with 64-byte payloads and data bitrates up to 5 Mbit/s. Red uses
+transmit FIFO mode (`TXBC.TFQM = 0`) and allocates slots through the hardware
+FIFO put index (`TXFQS.TFQPI`). This preserves frame order under load, including
+repeated CAN IDs, while keeping multiple transmissions queued. Like white and
+black's `TXFP` setting, this selects submission order across different IDs too.
+Red targets the STM32H725 with direct SMPS supply.
 
 ### Harness connection and orientation
 

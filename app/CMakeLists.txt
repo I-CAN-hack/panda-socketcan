@@ -18,3 +18,8 @@ target_sources_ifdef(CONFIG_CANNECTIVITY_TIMESTAMP_COUNTER app PRIVATE
 if(CONFIG_BOARD_PANDA_BLACK OR CONFIG_BOARD_PANDA_RED)
   target_sources(app PRIVATE harness.c)
 endif()
+
+# Red panda uses an M_CAN FIFO so equal-ID frames keep their submission order.
+if(CONFIG_BOARD_PANDA_RED)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/mcan_tx_fifo.cmake)
+endif()
