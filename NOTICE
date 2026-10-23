@@ -7,7 +7,7 @@ Third-party materials retain their original copyright notices and licenses.
 CANnectivity
 ------------
 https://github.com/CANnectivity/cannectivity
-Revision f229e129aa0859b79f2997d1cdc0443e10d97eee (v1.4.0)
+Revision 5719a5499751b77483eef7ce54512079d6ba91b1 (v1.5.0-dev)
 
 app/main.c and app/CMakeLists.txt are adapted from the corresponding files
 in CANnectivity's app directory. The adaptations add panda board selection,

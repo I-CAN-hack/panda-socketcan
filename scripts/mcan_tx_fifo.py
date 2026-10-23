@@ -28,14 +28,14 @@ def fifo_source(source: str) -> str:
 	 */
 	err = can_mcan_read_reg(dev, CAN_MCAN_TXFQS, &reg);
 	if (err != 0) {
-		goto err_unlock;
+		goto unlock;
 	}
 
 	put_idx = FIELD_GET(CAN_MCAN_TXFQS_TFQPI, reg);
 	if ((reg & CAN_MCAN_TXFQS_TFQF) != 0U || put_idx >= cbs->num_tx ||
 	    cbs->tx[put_idx].function != NULL) {
 		err = -EAGAIN;
-		goto err_unlock;
+		goto unlock;
 	}""",
         ),
     ]

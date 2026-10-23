@@ -90,8 +90,9 @@ nix develop
 The flake provides GNU Arm Embedded GCC/binutils/GDB, Zephyr's Python build
 dependencies and `west`, CMake, Ninja, dtc, dfu-util, USB utilities, can-utils,
 iproute2, ShellCheck and nixfmt. No separate Zephyr SDK or pip installation is
-needed. The source versions are CANnectivity **v1.4.0** and Zephyr **v4.4.0**;
-Zephyr pins the CMSIS and STM32 HAL revisions through its imported manifest.
+needed. The source versions are pinned CANnectivity **v1.5.0-dev** (`5719a54`)
+and Zephyr **v4.5.0-rc3** (`bf6e3a1a`) snapshots. Zephyr pins the CMSIS and STM32
+HAL revisions through its imported manifest.
 
 `manifest/west.yml` defines these dependencies. Boards live under
 `boards/comma/panda_{white,black,red}/`, with shared F4 hardware in

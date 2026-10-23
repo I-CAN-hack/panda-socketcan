@@ -3,11 +3,11 @@ manifest:
   projects:
     - name: cannectivity
       url: https://github.com/CANnectivity/cannectivity
-      revision: f229e129aa0859b79f2997d1cdc0443e10d97eee # v1.4.0
+      revision: 5719a5499751b77483eef7ce54512079d6ba91b1 # v1.5.0-dev
       path: deps/cannectivity
     - name: zephyr
       url: https://github.com/zephyrproject-rtos/zephyr
-      revision: 684c9e8f32e4373a21098559f748f06915f950c9 # v4.4.0
+      revision: bf6e3a1a047822ebddde70d2a53950d8b8e1c8d1 # v4.5.0-rc3 (main)
       # The import's path-prefix applies to this project as well as its modules.
       path: zephyr
       import:

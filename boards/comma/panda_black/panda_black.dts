@@ -28,8 +28,12 @@
 	flipped-standby-gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;
 };
 
-&adc1 {
+&adc123_common {
 	st,adc-prescaler = <4>;
+	status = "okay";
+};
+
+&adc1 {
 	status = "okay";
 };
 
